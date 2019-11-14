@@ -11,26 +11,37 @@ usage: bulker.py [-h] -d DIR [-p PATTERN] [-n PACK_NAME] -l {0,by,nc}
 
 optional arguments:
   -h, --help            show this help message and exit
+
   -d DIR, --dir DIR     directory of sounds (default: None)
+
   -p PATTERN, --pattern PATTERN
                         optional pattern of files to describe, e.g. -p
                         "sample*.wav" (used with -d) (default: *)
+
   -n PACK_NAME, --name PACK_NAME
                         pack name (default: None)
+
   -l {0,by,nc}, --license {0,by,nc}
                         license (default: None)
+
   -g GEOTAG, --geotag GEOTAG
                         geotag in double quotes, e.g. "41.40348, 2.189420, 18"
                         (default: None)
+
   -x, --explicit        mark sounds as explicit content (default: False)
+
   -df DESC_FILE, --desc DESC_FILE
                         text file with the description (default: None)
+
   -t TAGS, --tags TAGS  tags in double quotes, e.g. "tag1 tag2" (default:
                         None)
+
   -nt, --name_tags      make extra tags from words in the file name (default:
                         False)
+
   -ns NAME_SEP, --name_sep NAME_SEP
                         name separator e.g. "-" (used with -nt) (default: _)
+
   -o OUTPUT_FILE, --output_file OUTPUT_FILE
                         output file name, standard output used if omitted
                         (default: None)
