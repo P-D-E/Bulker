@@ -225,7 +225,7 @@ def is_geotag_valid(geotag):
     :param str geotag: the geotag to check
     :return bool: True if the tag is valid, False otherwise
     """
-    if geotag is None:
+    if geotag is None or geotag == '':
         return True
     try:
         data = geotag.split(", ")
