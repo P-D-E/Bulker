@@ -269,12 +269,15 @@ def create_csv(args, gui):
             else:
                 tags = quote(args.tags)
             line = ",".join([file_name, file_name, tags, quote(args.geotag), desc, licenses[args.license.lower()],
-                             args.pack_name, str(int(args.explicit))]) + "\n"
+                             args.pack_name or '', str(int(args.explicit))]) + "\n"
             csv.append(line)
     if args.output_file:
         if os.path.exists(args.output_file) and not gui:
-            choice = input("Destination file " + args.output_file + " exists. Overwrite? [y/N] ")
-            if choice.lower() != 'y':
+            try:  # Python 2.X
+                choice = raw_input("Destination file " + args.output_file + " exists. Overwrite? [y/N] ")
+            except NameError:  # Python 3.X
+                choice = input("Destination file " + args.output_file + " exists. Overwrite? [y/N] ")
+            if str(choice).lower() != 'y':
                 return
         try:
             with open(args.output_file, "w") as f:
@@ -319,7 +322,7 @@ def handle_command_line():
     parser.add_argument("-p", "--pattern", default="*",
                         help="optional pattern of files to describe, e.g. -p \"sample*.wav\" (used with -d)")
     parser.add_argument("-n", "--name", dest="pack_name", help="pack name")
-    parser.add_argument("-l", "--license", choices=["0", "by", "nc"], required=True, help="license")
+    parser.add_argument("-l", "--license", choices=["0", "by", "nc"], required=True, default="0", help="license")
     parser.add_argument("-g", "--geotag", help="geotag in double quotes, e.g. \"41.40348, 2.189420, 18\"")
     parser.add_argument("-x", "--explicit", action="store_true", help="mark sounds as explicit content")
     parser.add_argument("-df", "--desc", dest="desc_file", required=True, help="text file with the description")

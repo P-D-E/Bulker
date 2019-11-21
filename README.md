@@ -22,7 +22,7 @@ optional arguments:
                         pack name (default: None)
 
   -l {0,by,nc}, --license {0,by,nc}
-                        license (default: None)
+                        license (default: 0)
 
   -g GEOTAG, --geotag GEOTAG
                         geotag in double quotes, e.g. "41.40348, 2.189420, 18"
