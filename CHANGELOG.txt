@@ -1,3 +1,9 @@
+0.0.3 - 2019-11-23
+Improved support for different encodings when reading the description file
+
+Improved support for Python 2.X
+
+
 0.0.2 - 2019-11-21
 Fixed handling of absent pack name
 

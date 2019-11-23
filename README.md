@@ -33,7 +33,9 @@ optional arguments:
   -df DESC_FILE, --desc DESC_FILE
                         text file with the description (default: None)
 
-  -t TAGS, --tags TAGS  tags in double quotes, e.g. "tag1 tag2" (default:
+ -e ENCODING, --encoding ENCODING encoding of the text file with the description (default: None)
+                        
+ -t TAGS, --tags TAGS  tags in double quotes, e.g. "tag1 tag2" (default:
                         None)
 
   -nt, --name_tags      make extra tags from words in the file name (default:
@@ -54,6 +56,8 @@ The name_tags option splits the file name based on the "_" character (unless spe
 
 The geotag syntax is checked according to Freesound's FAQ here:
 https://freesound.org/help/faq/#i-have-many-sounds-to-upload-is-there-a-way-to-describe-many-sounds-in-bulk
+
+Bulker tries to read the description file using various encodings; if you get errors, use the -e option to specify the encoding you're using. Refer to https://docs.python.org/2/library/codecs.html#standard-encodings for the names to use.  
 
 
 ## Requirements

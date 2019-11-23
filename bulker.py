@@ -20,7 +20,9 @@
 
 import argparse
 import fnmatch
+import io
 import os
+import locale
 try:  # Python 2.X
     from Tkinter import *
     import tkFileDialog as filedialog, tkMessageBox as messagebox
@@ -40,6 +42,7 @@ class GuiArgs:
     dir_name = ""
     pattern = ""
     desc_file = ""
+    encoding = ""
     tags = ""
     name_tags = False
     name_sep = "_"
@@ -63,6 +66,7 @@ class App:
         self.dir_name.set("")
         self.pattern = StringVar()
         self.desc_file = StringVar()
+        self.encoding = StringVar()
         self.license = StringVar()
         self.license.set("0")
         self.name_tags = BooleanVar()
@@ -111,6 +115,10 @@ class App:
         self.t_desc.grid(row=3, column=1, sticky=W+E)
         self.b_desc = Button(master, text="...", command=self.pick_desc_file)
         self.b_desc.grid(row=3, column=2, sticky=W)
+        w = Label(master, text="Text encoding")
+        w.grid(row=3, column=3, sticky=E)
+        self.t_enc = Entry(master, textvariable=self.encoding)
+        self.t_enc.grid(row=3, column=4, sticky=W)
 
         w = Label(master, text="Tags")
         w.grid(row=4, sticky=E)
@@ -250,17 +258,68 @@ def warn(title, msg, gui):
     else:
         print(msg)
 
-    
+
+def get_encodings(text_encoding):
+    """
+    Returns a list of encodings, starting with the current locale and, if specified, the one from the options.
+    :param str text_encoding: user specified text_encoding
+    :return list: the list of encodings
+    """
+    # Refer to https://docs.python.org/2/library/codecs.html#standard-encodings to add more at will
+    encodings = ["UTF-8"]
+    encodings += [str(x) for x in range(1250, 1259)]
+    encodings += ["latin" + str(x) for x in range(1, 11)]
+    loc = locale.getlocale()[1]
+    if loc not in encodings:
+        encodings = [loc] + encodings
+    if text_encoding and text_encoding != "UTF-8":  # if one is specified by command-line argument, always try it first
+        encodings = [text_encoding] + encodings
+    return encodings
+
+
+def read_desc_file(desc_file, text_encoding="UTF-8"):
+    """
+    Reads the description file, using the specified encoding.
+    :param str desc_file: the description file path
+    :param str text_encoding: the specified encoding
+    :return list: the list of text lines with the description
+    """
+    try:  # Python 3.X
+        with open(desc_file, mode="r", newline=None, encoding=text_encoding) as f:
+            desc = f.read()
+    except TypeError:  # Python 2.X
+        with io.open(desc_file, mode="rU", encoding=text_encoding) as f:
+            desc = f.read()
+    desc = '"' + desc.replace('"', '\\"') + '"'
+    return desc
+
+
+def get_desc(desc_file, text_encoding):
+    """
+    Reads the description file, trying the available encodings and the user specified encoding, if present.
+    :param str desc_file: the description file path
+    :param text_encoding: the user specified encoding
+    :return list: the list of text lines with the description
+    """
+    for encoding in get_encodings(text_encoding):
+        try:
+            return read_desc_file(desc_file, text_encoding=encoding)
+        except UnicodeDecodeError:
+            pass
+    return None
+
+
 def create_csv(args, gui):
     """
     Creates the csv and saves it into the output file if specified, or prints it to the console.
     :param args: the arguments, specified either via command line or via GUI
     :param bool gui: indicates if using the GUI or not
     """
-    with open(args.desc_file, mode="r") as f:
-        desc = f.read()
-    desc = '"' + desc.replace('"', '\\"') + '"'
-    csv = ["audio_filename,name,tags,geotag,description,license,pack_name,is_explicit\n"]
+    desc = get_desc(args.desc_file, args.encoding)
+    if not desc:
+        warn("Attention", "Description file text encoding not supported.", gui)
+        return
+    csv = [u"audio_filename,name,tags,geotag,description,license,pack_name,is_explicit\n"]
     files = os.listdir(args.dir_name)
     for file_name in files:
         if fnmatch.fnmatch(file_name, args.pattern):
@@ -280,10 +339,10 @@ def create_csv(args, gui):
             if str(choice).lower() != 'y':
                 return
         try:
-            with open(args.output_file, "w") as f:
+            with io.open(args.output_file, "w", encoding="utf8") as f:
                 f.writelines(csv)
-        except PermissionError:
-            warn("Attention", "Error: writing file " + args.output_file + " not permitted.", gui)
+        except IOError:
+            warn("Attention", "Error: writing file " + args.output_file + " failed.", gui)
     else:
         for line in csv:
             print(line[:-1])
@@ -326,6 +385,7 @@ def handle_command_line():
     parser.add_argument("-g", "--geotag", help="geotag in double quotes, e.g. \"41.40348, 2.189420, 18\"")
     parser.add_argument("-x", "--explicit", action="store_true", help="mark sounds as explicit content")
     parser.add_argument("-df", "--desc", dest="desc_file", required=True, help="text file with the description")
+    parser.add_argument("-e", "--encoding", help="encoding of the text file with the description")
     parser.add_argument("-t", "--tags", required=True, help="tags in double quotes, e.g. \"tag1 tag2\"")
     parser.add_argument("-nt", "--name_tags", action="store_true", help="make extra tags from words in the file name")
     parser.add_argument("-ns", "--name_sep", default="_", help="name separator e.g. \"-\" (used with -nt)")
