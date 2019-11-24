@@ -57,7 +57,7 @@ The name_tags option splits the file name based on the "_" character (unless spe
 The geotag syntax is checked according to Freesound's FAQ here:
 https://freesound.org/help/faq/#i-have-many-sounds-to-upload-is-there-a-way-to-describe-many-sounds-in-bulk
 
-Bulker tries to read the description file using various encodings; if you get errors, use the -e option to specify the encoding you're using. Refer to https://docs.python.org/2/library/codecs.html#standard-encodings for the names to use.  
+Bulker tries to read the description file using your current locale encoding and UTF-8; if you get errors or your diacritics are wrongly mapped in the resulting csv, use the -e option to specify the encoding you're using. Refer to https://docs.python.org/2/library/codecs.html#standard-encodings for the names to use.  
 
 
 ## Requirements

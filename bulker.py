@@ -267,8 +267,6 @@ def get_encodings(text_encoding):
     """
     # Refer to https://docs.python.org/2/library/codecs.html#standard-encodings to add more at will
     encodings = ["UTF-8"]
-    encodings += [str(x) for x in range(1250, 1259)]
-    encodings += ["latin" + str(x) for x in range(1, 11)]
     loc = locale.getlocale()[1]
     if loc not in encodings:
         encodings = [loc] + encodings
